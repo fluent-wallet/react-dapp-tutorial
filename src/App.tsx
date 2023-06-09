@@ -4,7 +4,7 @@ const App = () => {
 
   return (
     <div className="App">
-      <button>Connect MetaMask</button>
+      <button>Connect Fluent</button>
     </div>
   )
 }
