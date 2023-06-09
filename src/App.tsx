@@ -1,16 +1,16 @@
 import './App.css'
 import { useState, useEffect } from 'react'
 import { formatBalance, formatChainAsNum } from './utils'
-import detectEthereumProvider from '@metamask/detect-provider'
+import detectProvider from '@fluent-wallet/detect-provider'
 
 const App = () => {
   const [hasProvider, setHasProvider] = useState<boolean | null>(null)
   const initialState = { accounts: [], balance: "", chainId: "" }
   const [wallet, setWallet] = useState(initialState)
 
-  const [isConnecting, setIsConnecting] = useState(false)
-  const [error, setError] = useState(false)
-  const [errorMessage, setErrorMessage] = useState("")
+  const [isConnecting, setIsConnecting] = useState(false)  
+  const [error, setError] = useState(false)                
+  const [errorMessage, setErrorMessage] = useState("")    
 
   useEffect(() => {
     const refreshAccounts = (accounts: any) => {
@@ -27,52 +27,55 @@ const App = () => {
     }
 
     const getProvider = async () => {
-      const provider = await detectEthereumProvider({ silent: true })
+      const provider = await detectProvider({
+        injectFlag: "conflux",
+        defaultWalletFlag: "isFluent",
+      })
       setHasProvider(Boolean(provider))
 
       if (provider) {
-        const accounts = await window.ethereum.request(
-          { method: 'eth_accounts' }
+        const accounts = await window.conflux.request(
+          { method: 'cfx_accounts' }
         )
         refreshAccounts(accounts)
-        window.ethereum.on('accountsChanged', refreshAccounts)
-        window.ethereum.on("chainChanged", refreshChain)
+        window.conflux.on('accountsChanged', refreshAccounts)
+        window.conflux.on("chainChanged", refreshChain)
       }
     }
 
     getProvider()
 
     return () => {
-      window.ethereum?.removeListener('accountsChanged', refreshAccounts)
-      window.ethereum?.removeListener("chainChanged", refreshChain)
+      window.conflux?.removeListener('accountsChanged', refreshAccounts)
+      window.conflux?.removeListener("chainChanged", refreshChain)
     }
   }, [])
 
   const updateWallet = async (accounts: any) => {
-    const balance = formatBalance(await window.ethereum!.request({
-      method: "eth_getBalance",
-      params: [accounts[0], "latest"],
+    const balance = formatBalance(await window.conflux!.request({
+      method: "cfx_getBalance",
+      params: [accounts[0]],
     }))
-    const chainId = await window.ethereum!.request({
-      method: "eth_chainId",
+    const chainId = await window.conflux!.request({
+      method: "cfx_chainId",
     })
     setWallet({ accounts, balance, chainId })
   }
 
-  const handleConnect = async () => {
-    setIsConnecting(true)
-    await window.ethereum.request({
-      method: "eth_requestAccounts",
+  const handleConnect = async () => {                  
+    setIsConnecting(true)                              
+    await window.conflux.request({                    
+      method: "cfx_requestAccounts",
     })
-    .then((accounts:[]) => {
-      setError(false)
-      updateWallet(accounts)
-    })
-    .catch((err:any) => {
-      setError(true)
-      setErrorMessage(err.message)
-    })
-    setIsConnecting(false)
+    .then((accounts:[]) => {                            
+      setError(false)                                  
+      updateWallet(accounts)                           
+    })                                                 
+    .catch((err:any) => {                               
+      setError(true)                                   
+      setErrorMessage(err.message)                     
+    })                                                  
+    setIsConnecting(false)                             
   }
 
   const disableConnect = Boolean(wallet) && isConnecting
@@ -81,8 +84,9 @@ const App = () => {
     <div className="App">
       <div>Injected Provider {hasProvider ? 'DOES' : 'DOES NOT'} Exist</div>
 
-      {window.ethereum?.isMetaMask && wallet.accounts.length < 1 &&
-        <button disabled={disableConnect} onClick={handleConnect}>Connect MetaMask</button>
+      {window.conflux?.isFluent && wallet.accounts.length < 1 &&
+                /* Updated */
+        <button disabled={disableConnect} onClick={handleConnect}>Connect Fluent</button>
       }
 
       {wallet.accounts.length > 0 &&
@@ -93,7 +97,7 @@ const App = () => {
           <div>Numeric ChainId: {formatChainAsNum(wallet.chainId)}</div>
         </>
       }
-      { error && (
+      { error && (                                       
           <div onClick={() => setError(false)}>
             <strong>Error:</strong> {errorMessage}
           </div>
