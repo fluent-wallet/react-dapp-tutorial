@@ -1,6 +1,6 @@
-# React Dapp with Global State
+# React Dapp with Local State
 
-Create a simple React dapp that integrates Fluent and utilize React Context Provider for global state.
+Create a simple React dapp to integrate with Fluent.
 
 ## Pre Requisites
 
