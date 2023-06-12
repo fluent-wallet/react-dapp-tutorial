@@ -5,9 +5,9 @@ export const Navigation = () => {
   return (
     <div className={styles.navigation}>
       <div className={styles.flexContainer}>
-        <div className={styles.leftNav}>Vite + React & MetaMask</div>
+        <div className={styles.leftNav}>Vite + React & Fluent</div>
         <div className={styles.rightNav}>
-          Connect MetaMask
+          Connect Fluent
         </div>
       </div>
     </div>
