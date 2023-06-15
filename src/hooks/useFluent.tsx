@@ -35,8 +35,8 @@ export const FluentContextProvider = ({ children }: PropsWithChildren) => {
   const [wallet, setWallet] = useState(disconnectedState)
   // useCallback ensures that you don't uselessly recreate the _updateWallet function on every render
   const _updateWallet = useCallback(async (providedAccounts?: any) => {
-    const accounts = providedAccounts || await window.conflux.request(
-      { method: 'cfx_accounts' },
+    const accounts = providedAccounts || await window.ethereum.request(
+      { method: 'eth_accounts' },
     )
 
     if (accounts.length === 0) {
@@ -45,12 +45,12 @@ export const FluentContextProvider = ({ children }: PropsWithChildren) => {
       return
     }
 
-    const balance = formatBalance(await window.conflux.request({
-      method: 'cfx_getBalance',
+    const balance = formatBalance(await window.ethereum.request({
+      method: 'eth_getBalance',
       params: [accounts[0]],
     }))
-    const chainId = await window.conflux.request({
-      method: 'cfx_chainId',
+    const chainId = await window.ethereum.request({
+      method: 'eth_chainId',
     })
 
     setWallet({ accounts, balance, chainId })
@@ -68,23 +68,23 @@ export const FluentContextProvider = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     const getProvider = async () => {
       const provider = await detectProvider({
-        injectFlag: 'conflux',
+        injectFlag: 'ethereum',
         defaultWalletFlag: 'isFluent',
       })
       setHasProvider(Boolean(provider))
 
       if (provider) {
         updateWalletAndAccounts()
-        window.conflux.on('accountsChanged', updateWallet)
-        window.conflux.on('chainChanged', updateWalletAndAccounts)
+        window.ethereum.on('accountsChanged', updateWallet)
+        window.ethereum.on('chainChanged', updateWalletAndAccounts)
       }
     }
 
     getProvider()
 
     return () => {
-      window.conflux?.removeListener('accountsChanged', updateWallet)
-      window.conflux?.removeListener('chainChanged', updateWalletAndAccounts)
+      window.ethereum?.removeListener('accountsChanged', updateWallet)
+      window.ethereum?.removeListener('chainChanged', updateWalletAndAccounts)
     }
   }, [updateWallet, updateWalletAndAccounts])
 
@@ -92,8 +92,8 @@ export const FluentContextProvider = ({ children }: PropsWithChildren) => {
     setIsConnecting(true)
 
     try {
-      const accounts = await window.conflux.request({
-        method: 'cfx_requestAccounts',
+      const accounts = await window.ethereum.request({
+        method: 'eth_requestAccounts',
       })
       clearError()
       updateWallet(accounts)

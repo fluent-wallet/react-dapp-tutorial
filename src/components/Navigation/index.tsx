@@ -16,7 +16,7 @@ export const Navigation = () => {
               Install Fluent
             </a>
           }
-          {window.conflux?.isFluent && wallet.accounts.length < 1 &&
+          {window.ethereum?.isFluent && wallet.accounts.length < 1 &&
             <button disabled={isConnecting} onClick={connectFluent}>
               Connect Fluent
             </button>
