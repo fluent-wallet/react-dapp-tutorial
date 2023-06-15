@@ -28,44 +28,44 @@ const App = () => {
 
     const getProvider = async () => {
       const provider = await detectProvider({
-        injectFlag: "conflux",
+        injectFlag: "ethereum",
         defaultWalletFlag: "isFluent",
       })
       setHasProvider(Boolean(provider))
 
       if (provider) {
-        const accounts = await window.conflux.request(
-          { method: 'cfx_accounts' }
+        const accounts = await window.ethereum.request(
+          { method: 'eth_accounts' }
         )
         refreshAccounts(accounts)
-        window.conflux.on('accountsChanged', refreshAccounts)
-        window.conflux.on("chainChanged", refreshChain)
+        window.ethereum.on('accountsChanged', refreshAccounts)
+        window.ethereum.on("chainChanged", refreshChain)
       }
     }
 
     getProvider()
 
     return () => {
-      window.conflux?.removeListener('accountsChanged', refreshAccounts)
-      window.conflux?.removeListener("chainChanged", refreshChain)
+      window.ethereum?.removeListener('accountsChanged', refreshAccounts)
+      window.ethereum?.removeListener("chainChanged", refreshChain)
     }
   }, [])
 
   const updateWallet = async (accounts: any) => {
-    const balance = formatBalance(await window.conflux!.request({
-      method: "cfx_getBalance",
+    const balance = formatBalance(await window.ethereum!.request({
+      method: "eth_getBalance",
       params: [accounts[0]],
     }))
-    const chainId = await window.conflux!.request({
-      method: "cfx_chainId",
+    const chainId = await window.ethereum!.request({
+      method: "eth_chainId",
     })
     setWallet({ accounts, balance, chainId })
   }
 
   const handleConnect = async () => {                  
     setIsConnecting(true)                              
-    await window.conflux.request({                    
-      method: "cfx_requestAccounts",
+    await window.ethereum.request({                    
+      method: "eth_requestAccounts",
     })
     .then((accounts:[]) => {                            
       setError(false)                                  
@@ -84,7 +84,7 @@ const App = () => {
     <div className="App">
       <div>Injected Provider {hasProvider ? 'DOES' : 'DOES NOT'} Exist</div>
 
-      {window.conflux?.isFluent && wallet.accounts.length < 1 &&
+      {window.ethereum?.isFluent && wallet.accounts.length < 1 &&
                 /* Updated */
         <button disabled={disableConnect} onClick={handleConnect}>Connect Fluent</button>
       }
